@@ -44,7 +44,7 @@ double* append_to_array(double element,
       double* new_array = extend_array(array, current_size, current_size + 5);
       max_size += 5;
       new_array[current_size] = element;
-      new_array = shrink_array(new_array, max_size, current_size+1);
+
       current_size += 1;
       return new_array;
   }
@@ -96,14 +96,19 @@ bool simulate_projectile(const double magnitude, const double angle,
     if (target_coordinates != NULL) {
       remove_target(targets, tot_targets, target_coordinates);
       hit_target = true;
-    } else if (find_collision(x, y, obstacles, tot_obstacles) != NULL) {
+    }
+    else if (find_collision(x, y, obstacles, tot_obstacles) != NULL) {
       hit_obstacle = true;
-    } else {
+    }
+    else {
       t = t + simulation_interval;
       y = v0_y * t  - 0.5 * g * t * t;
       x = v0_x * t;
     }
-  }
+    telemetry = append_to_array(t, telemetry, telemetry_current_size, telemetry_max_size);
+    telemetry = append_to_array(x, telemetry, telemetry_current_size, telemetry_max_size);
+    telemetry = append_to_array(y, telemetry, telemetry_current_size, telemetry_max_size);
+ }
 
   return hit_target;
 }
@@ -114,5 +119,87 @@ void merge_telemetry(double **telemetries,
                      double* &global_telemetry,
                      int &global_telemetry_current_size,
                      int &global_telemetry_max_size) {
-  // IMPLEMENT YOUR FUNCTION HERE
+
+    for (int i = 0; i < tot_telemetries; i ++){
+        for (int j = 0; j < telemetries_sizes[i]; j ++){
+            global_telemetry = append_to_array(telemetries[i][j], global_telemetry, global_telemetry_current_size, global_telemetry_max_size);
+        }
+    }
+    for (int i = 0; i < global_telemetry_current_size; i ++){
+        for (int j = 0; j < global_telemetry_current_size - 5; j += 3){
+            if ((global_telemetry[j] > global_telemetry[j+3])){
+                double t1, t2;
+                t1 = global_telemetry[j];
+                t2 = global_telemetry[j+3];
+
+                global_telemetry[j] = t2;
+                global_telemetry[j+3]= t1;
+
+                double x1, x2;
+                x1 = global_telemetry[j+1];
+                x2 = global_telemetry[j+4];
+
+                global_telemetry[j+1] = x2;
+                global_telemetry[j+4]= x1;
+
+                double y1, y2;
+                y1 = global_telemetry[j+2];
+                y2 = global_telemetry[j+5];
+
+                global_telemetry[j+2] = y2;
+                global_telemetry[j+5]= y1;
+
+            }
+        }
+    }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
